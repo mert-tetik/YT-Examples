@@ -1,0 +1,110 @@
+#Sample node file
+#Created for a YouTube video
+#Link : https://www.youtube.com/watch?v=A-9XZ7egmy8
+
+%attributes;
+$ #Render the 3D model instead of a orthographic plane
+
+-title : Image Texture; #Is not used
+-color : hex0000ff; #rgb122,124,66  hsv86,45,23 (Color of the bar)
+-opacity : 60; #Is not used 
+
+#That listbox on top of the node
+#Assigns the result to the int list_0 uniform
+
+-list_0 :
+--title_0 : Multiply; #If selected list_0 = 0
+--title_1 : Add; #If selected list_0 = 1
+
+-input_0 : 
+--list : none; #Is not used
+--list_index : none; #Is not used
+--type : vec3; #vec3 , vec2 , float 
+--title : Source;
+--element : color; # range , image , color
+--value : 255,0,0; #0 - 255 (red rn) 
+
+-input_1 : 
+--list : none;
+--list_index : none; 
+--type : float; 
+--title : Brightness;
+--element : range; 
+--value : 255; 
+
+-output_0 :
+--list : none;
+--list_index : none;
+--type : vec3; 
+--title : Texture; #Only change this
+
+-output_1 :
+--list : none;
+--list_index : none;
+--type : float; 
+--title : Texture; #Only change this
+
+#posModel : model pos
+#posScene : projected model pos
+
+-uniforms : tex_coords|normal|posScene|posModel; #From vertex shader
+
+%code;
+//GLSL Code here
+
+void main(){
+    float b = texture(input_1,tex_coords).r * 2.; //brightness value
+
+    output_0 = texture(input_0,tex_coords); //the source texture (will be modified)
+
+    if(list_0 == 0) //If multiply is selected
+        output_0 *= vec4(b);
+    else //If add is selected
+        output_0 += vec4(b);
+
+    //The same thing
+    output_1 = texture(input_0,tex_coords); //the source texture (will be modified)
+    if(list_0 == 0)
+        output_1 *= vec4(b);
+    else
+        output_1 += vec4(b);
+    
+    //grayscale
+    output_1.gb = vec2(output_1.rr); 
+}
+
+//-----------------------------------------------------------
+//How LigidPainter completes your code :
+
+//#version 330 core
+
+//in vec2 tex_coords;
+//in vec3 normal;
+//in vec4 posScene;
+//in vec3 posModel;
+
+//uniform sampler2D input_0;
+//uniform sampler2D input_1;
+
+//uniform int list_0;
+
+//layout(location = 0) out vec4 output_0;
+//layout(location = 1) out vec4 output_1;
+
+//void main(){
+//    float b = texture(input_1,tex_coords).r * 2.; //brightness
+//
+//    output_0 = texture(input_0,tex_coords);
+//    if(list_0 == 0)
+//        output_0 *= vec4(b);
+//    else
+//        output_0 += vec4(b);
+//
+//    //Grayscale
+//    output_1 = texture(input_0,tex_coords);
+//    if(list_0 == 0)
+//        output_1 *= vec4(b);
+//    else
+//        output_1 += vec4(b);
+//    output_1.gb = vec2(output_0.rr); 
+//}
